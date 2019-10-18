@@ -1,0 +1,40 @@
+resources(
+    name = "resources",
+    sources = rglobs("src/main/resources/*"),
+)
+
+java_library(
+    name = "jar",
+    sources = rglobs("src/main/java/*.java"),
+    dependencies = [
+        ":resources",
+    {%- for dep in compile %}
+        {{dep}},
+    {%- endfor %}
+    ],
+)
+
+resources(
+    name = "test-resources",
+    sources = rglobs("src/test/resources/*"),
+)
+
+java_library(
+    name = "test-jar",
+    sources = rglobs("src/test/java/*.java"),
+    dependencies = [
+        ":jar",
+        ":test-resources",
+    {%- for dep in test %}
+        {{dep}},
+    {%- endfor %}
+    ],
+)
+
+# junit_tests(
+#     name = "tests",
+#     select_package = "org.neo4j.annotations.service",
+#     runtime_deps = [
+#         ":test-jar",
+#     ],
+# )

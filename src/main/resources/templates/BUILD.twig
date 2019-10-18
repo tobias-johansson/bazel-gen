@@ -1,0 +1,38 @@
+package(default_visibility = ["//visibility:public"])
+
+load("@//build/tools:java.bzl", "junit5_tests")
+
+java_library(
+    name = "jar",
+    srcs = glob(["src/main/java/**/*.java"]),
+    deps = [
+    {%- for dep in compile %}
+        "{{dep}}",
+    {%- endfor %}
+    ],
+    javacopts = [
+    {%- for arg in compilerArgs %}
+        "{{arg}}",
+    {%- endfor %}
+    ],
+)
+
+java_library(
+    name = "test-jar",
+    srcs = glob(["src/test/java/**/*.java"]),
+    resources = glob(["src/test/resources/**"]),
+    deps = [
+        ":jar",
+    {%- for dep in test %}
+        "{{dep}}",
+    {%- endfor %}
+    ],
+)
+
+junit5_tests(
+    name = "tests",
+    select_package = "org.neo4j.annotations.service",
+    runtime_deps = [
+        ":test-jar",
+    ],
+)
