@@ -1,7 +1,11 @@
 package(default_visibility = ["//visibility:public"])
 
-load("@//build/tools:java.bzl", "junit5_tests")
+load("@//tools/build:java.bzl", "junit5_tests")
+{%- if module.buildAsScala() %}
+load("@io_bazel_rules_scala//scala:scala.bzl", "scala_library", "scala_binary", "scala_test")
+{%- endif %}
 
+{%- if module.buildAsJava() %}
 java_library(
     name = "jar",
     srcs = glob(["src/main/java/**/*.java"]),
@@ -16,7 +20,22 @@ java_library(
     {%- endfor %}
     ],
 )
+{%- endif %}
 
+
+{%- if module.buildAsScala() %}
+scala_library(
+    name = "jar",
+    srcs = glob(["src/main/scala/**/*.scala", "src/main/java/**/*.java"]),
+    deps = [
+    {%- for dep in compile %}
+        "{{dep}}",
+    {%- endfor %}
+    ],
+)
+{%- endif %}
+
+{%- if module.hasTestJava() %}
 java_library(
     name = "test-jar",
     srcs = glob(["src/test/java/**/*.java"]),
@@ -31,8 +50,12 @@ java_library(
 
 junit5_tests(
     name = "tests",
-    select_package = "org.neo4j.annotations.service",
+    select_package = [
+        "org.neo4j",
+        "com.neo4j",
+    ],
     runtime_deps = [
         ":test-jar",
     ],
 )
+{%- endif %}

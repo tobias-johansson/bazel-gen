@@ -11,36 +11,40 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+
+import org.neo4j.model.Dependencies;
+import org.neo4j.model.Global;
+import org.neo4j.model.Module;
+import org.neo4j.tools.Files;
+import org.neo4j.tools.Locations;
 
 @Mojo(
-        name = "module-location",
+        name = "module-deps",
         defaultPhase = LifecyclePhase.GENERATE_SOURCES
 )
-public class ModuleLocation extends AbstractMojo
+public class ModuleDepsMojo extends AbstractMojo
 {
     @Parameter( defaultValue = "${project}", readonly = true, required = true )
     MavenProject project;
 
-    Path root = Paths.get( "/home/tobias/Projects/neo4j" );
+    @Parameter( required = true, property = "rootDir" )
+    String rootDir;
 
     public void execute() throws MojoExecutionException
     {
-        printPomPath();
+        Global global = new Global( new Files( rootDir ) );
+        Module module = new Module( project, global );
+        printDeps( global.locations.files.tmp.resolve( "all-deps.txt" ).toFile(), module );
     }
 
-    private void printPomPath()
+    private void printDeps( File out, Module module )
     {
-        Path base = Paths.get( project.getBasedir().getAbsolutePath() );
-        Path relative = root.relativize( base );
-        String name = project.getGroupId() + ":" + project.getArtifactId();
-        String line = "\"" + name + "\"" + ", " + "\"" + relative.toString() + "\"";
-        System.out.println( line );
-        File out = root.resolve( "module-paths.txt" ).toFile();
         try ( FileOutputStream os = new FileOutputStream( out, true ); PrintStream ps = new PrintStream( os ) )
         {
-            ps.println( line );
+            module.dependencies()
+                  .filter( Dependencies.Dep::isExternal )
+                  .map( Dependencies.Dep::coords )
+                  .forEach( ps::println );
         }
         catch ( IOException e )
         {
