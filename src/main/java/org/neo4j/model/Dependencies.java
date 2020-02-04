@@ -1,6 +1,6 @@
 package org.neo4j.model;
 
-import org.apache.maven.model.Dependency;
+import org.apache.maven.artifact.Artifact;
 
 import org.neo4j.tools.Locations;
 
@@ -13,38 +13,38 @@ public class Dependencies
         this.locations = locations;
     }
 
-    public Dep create( Dependency dependency )
+    public Dep create( Artifact artifact )
     {
-        return new Dep( dependency );
+        return new Dep( artifact );
     }
 
     public class Dep
     {
-        private final Dependency dependency;
+        private final Artifact artifact;
 
-        private Dep( Dependency dependency )
+        private Dep( Artifact artifact )
         {
-            this.dependency = dependency;
+            this.artifact = artifact;
         }
 
         public String id()
         {
-            return dependency.getGroupId() + ":" + dependency.getArtifactId();
+            return artifact.getGroupId() + ":" + artifact.getArtifactId();
         }
 
         public String coords()
         {
-            return id() + ":" + dependency.getVersion();
+            return id() + ":" + artifact.getVersion();
         }
 
         public boolean isTest()
         {
-            return dependency.getScope().equals( "test" );
+            return "test".equals( artifact.getScope() );
         }
 
         public boolean isJarOrTestJar()
         {
-            return dependency.getType().equals( "jar" ) || dependency.getType().equals( "test-jar" );
+            return "jar".equals( artifact.getType() ) || "test-jar".equals( artifact.getType() );
         }
 
         public boolean isCompile()
@@ -54,7 +54,7 @@ public class Dependencies
 
         public boolean isInternal()
         {
-            return dependency.getVersion().equals( "4.0.1-SNAPSHOT" );
+            return "4.0.1-SNAPSHOT".equals( artifact.getVersion() );
         }
 
         public boolean isExternal()
@@ -62,7 +62,7 @@ public class Dependencies
             return !isInternal();
         }
 
-        public String target()
+        public String label()
         {
             return isInternal() ? internalTarget() : externalTarget();
         }
@@ -70,7 +70,7 @@ public class Dependencies
         private String internalTarget()
         {
             String loc = locations.map.get( id() );
-            return "//" + loc + ":" + dependency.getType();
+            return "//" + loc + ":" + artifact.getType();
         }
 
         private String externalTarget()

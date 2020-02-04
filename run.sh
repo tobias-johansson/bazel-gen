@@ -1,19 +1,22 @@
 #!/usr/bin/env bash
 
+self="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 root="$1"
 
 mvn install -DskipTests
 
-rm -fr "$root/.build-gen"
+rm -fr "$root/.bazel-gen"
 
 cd "$root"
-mvn org.neo4j:build-gen:module-locations -DrootDir="$root"
-mvn org.neo4j:build-gen:module-deps      -DrootDir="$root"
-mvn org.neo4j:build-gen:bazel-generate   -DrootDir="$root"
+mvn -o -e org.neo4j:bazel-gen:module-locations -DrootDir="$root"
+mvn -o -e org.neo4j:bazel-gen:module-deps      -DrootDir="$root"
+mvn -o -e org.neo4j:bazel-gen:bazel-generate   -DrootDir="$root"
 
+cat .bazel-gen/all-deps.txt | sort -u > .bazel-gen/all-deps.unique.txt
+deps=$(cat .bazel-gen/all-deps.txt | sort -u)
 
-cat .build-gen/all-deps.txt | sort -u > .build-gen/all-deps.unique.txt
-deps=$(cat .build-gen/all-deps.txt | sort -u)
+cp -r "$self/src/bazel/tools" "$root/"
+cp -r "$self/src/bazel/.bazelrc" "$root/"
 
 cat <<EOF > WORKSPACE
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
@@ -83,42 +86,14 @@ maven_install(
         "https://neo.jfrog.io/neo/benchmarking-thirdparty/",
     ],
 )
-EOF
 
-mkdir -p tools/build/
-cat <<EOF > tools/build/BUILD
-EOF
-
-cat <<EOF > tools/build/java.bzl
-"""JUnit5"""
-
-def junit5_tests(name, runtime_deps, select_package):
-    """Runs JUnit5 tests using the ConsoleLauncher
-    """
-    runtime_deps += [
-        "@maven//:org_junit_platform_junit_platform_console_standalone",
-    ]
-    args = [
-        "--fail-if-no-tests",
-    ]
-    for pkg in select_package:
-        args += [
-            "--select-package",
-            pkg,
-        ]
-    native.java_test(
-        name = name,
-        args = args,
-        main_class = "org.junit.platform.console.ConsoleLauncher",
-        use_testrunner = False,
-        runtime_deps = runtime_deps,
-    )
-EOF
-
-cat <<EOF > .bazelrc
-build --strict_java_deps=off
-build --javacopt="-source 11"
-build --javacopt="-target 11"
-build --javacopt="-XepDisableAllChecks"
-test --test_output=all
+maven_install(
+    name = "maven-tools",
+    artifacts = [
+        "com.puppycrawl.tools:checkstyle:8.29",
+    ],
+    repositories = [
+        "https://repo1.maven.org/maven2",
+    ],
+)
 EOF

@@ -20,7 +20,6 @@ public class XmlTools
         }
         catch ( Exception e )
         {
-            e.printStackTrace();
             return new XmlTools( Stream.empty() );
         }
     }

@@ -21,26 +21,4 @@ public class BazelGenerateMojoTest extends BetterAbstractMojoTestCase
     public void testSomething() throws Exception
     {
     }
-
-//    public void testSomething() throws Exception
-//    {
-//        Path proj = Paths.get( "/home/tobias/Projects/neo4j/public/annotations" );
-//        File pom = proj.resolve( "pom.xml" ).toFile();
-//        assertNotNull( pom );
-//        assertTrue( pom.exists() );
-//
-//        BazelGenerate bazelGenerate = (BazelGenerate) lookupConfiguredMojo( pom, "bazel-generate" );
-//        assertNotNull( bazelGenerate );
-//        bazelGenerate.execute();
-//
-//        File build = proj.resolve( "BUILD" ).toFile();
-//
-//        try (BufferedReader br = new BufferedReader(new FileReader(build))) {
-//            String line = null;
-//            while ((line = br.readLine()) != null) {
-//                System.out.println(line);
-//            }
-//        }
-//    }
-
 }

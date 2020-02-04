@@ -15,7 +15,7 @@ java_library(
     {%- endfor %}
     ],
     javacopts = [
-    {%- for arg in compilerArgs %}
+    {%- for arg in javacopts %}
         "{{arg}}",
     {%- endfor %}
     ],
@@ -32,10 +32,20 @@ scala_library(
         "{{dep}}",
     {%- endfor %}
     ],
+    scalacopts = [
+    {%- for arg in scalacopts %}
+        "{{arg}}",
+    {%- endfor %}
+    ],
+    scalac_jvm_flags = [
+    {%- for arg in scalac_jvm_flags %}
+        "{{arg}}",
+    {%- endfor %}
+    ],
 )
 {%- endif %}
 
-{%- if module.hasTestJava() %}
+{%- if module.testAsJava() %}
 java_library(
     name = "test-jar",
     srcs = glob(["src/test/java/**/*.java"]),
@@ -56,6 +66,28 @@ junit5_tests(
     ],
     runtime_deps = [
         ":test-jar",
+    ],
+)
+{%- endif %}
+
+{%- if module.testAsScala() %}
+scala_library(
+    name = "test-jar",
+    srcs = glob(["src/test/scala/**/*.scala", "src/test/java/**/*.java"]),
+    deps = [
+    {%- for dep in test %}
+        "{{dep}}",
+    {%- endfor %}
+    ],
+    scalacopts = [
+    {%- for arg in scalacopts %}
+        "{{arg}}",
+    {%- endfor %}
+    ],
+    scalac_jvm_flags = [
+    {%- for arg in scalac_jvm_flags %}
+        "{{arg}}",
+    {%- endfor %}
     ],
 )
 {%- endif %}

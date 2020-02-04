@@ -1,0 +1,9 @@
+build --java_toolchain=@bazel_tools//tools/jdk:toolchain_vanilla
+build --strict_java_deps=ERROR
+build --javacopt="-source 11"
+build --javacopt="-target 11"
+build --javacopt="-XepDisableAllChecks"
+build --strategy=Scalac=worker
+build --worker_sandboxing
+
+test --test_output=all

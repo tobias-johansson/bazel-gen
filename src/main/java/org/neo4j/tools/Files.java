@@ -17,7 +17,7 @@ public class Files
     public Files( Path root )
     {
         this.root = root;
-        this.tmp = root.resolve( ".build-gen" );
+        this.tmp = root.resolve( ".bazel-gen" );
         if (!java.nio.file.Files.exists( tmp ))
         {
             try
