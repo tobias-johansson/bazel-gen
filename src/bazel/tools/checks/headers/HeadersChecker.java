@@ -1,18 +1,13 @@
 package tools.checks.headers;
 
-import java.io.BufferedReader;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -20,9 +15,12 @@ class HeadersChecker
 {
     public static void main( String[] args )
     {
-        byte[] expected = load( "tools/checks/headers/header.java.public.txt" );
+        String headerType = args[0];
+
+        byte[] expected = load( "tools/checks/headers/" + headerType + ".java.txt" );
 
         List<Path> failures = Stream.of( args )
+                                    .skip(1)
                                     .map( Paths::get )
                                     .filter( p -> isFailure( expected, p ) )
                                     .collect( Collectors.toList() );
