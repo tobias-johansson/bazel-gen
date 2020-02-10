@@ -88,6 +88,16 @@ maven_install(
 )
 
 maven_install(
+    name = "maven-benchmarks",
+    artifacts = [
+        "org.neo4j.driver:neo4j-java-driver:1.7.3",
+    ],
+    repositories = [
+        "https://repo1.maven.org/maven2",
+    ],
+)
+
+maven_install(
     name = "maven-tools",
     artifacts = [
         "com.puppycrawl.tools:checkstyle:8.29",

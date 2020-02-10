@@ -32,7 +32,7 @@ public class Dependencies
             return artifact.getGroupId() + ":" + artifact.getArtifactId();
         }
 
-        public String coords()
+        public String coordinates()
         {
             return id() + ":" + artifact.getVersion();
         }
@@ -54,12 +54,12 @@ public class Dependencies
 
         public boolean isInternal()
         {
-            return "4.0.1-SNAPSHOT".equals( artifact.getVersion() );
+            return !isExternal();
         }
 
         public boolean isExternal()
         {
-            return !isInternal();
+            return locations.get( artifact.getGroupId(), artifact.getArtifactId() ) == null;
         }
 
         public String label()
@@ -69,8 +69,7 @@ public class Dependencies
 
         private String internalTarget()
         {
-            String loc = locations.map.get( id() );
-            return "//" + loc + ":" + artifact.getType();
+            return "//" + locations.locations.get( id() ) + ":" + artifact.getType();
         }
 
         private String externalTarget()

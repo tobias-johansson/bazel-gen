@@ -25,6 +25,22 @@ public class Module
         this.global = global;
     }
 
+    public String headerType()
+    {
+        if ( project.getGroupId().startsWith( "org" ) )
+        {
+            return "public";
+        }
+        else if ( project.getGroupId().startsWith( "com.neo4j.bench" ) )
+        {
+            return "tool";
+        }
+        else
+        {
+            return "private";
+        }
+    }
+
     private List<Artifact> dependencyArtifacts( boolean transitive )
     {
         ProjectBuildingRequest buildingRequest = new DefaultProjectBuildingRequest( global.session.getProjectBuildingRequest() );
@@ -76,6 +92,11 @@ public class Module
                                                 .map( global.dependencies::create );
     }
 
+    public boolean hasJar()
+    {
+        return buildAsJava() || buildAsScala();
+    }
+
     public boolean buildAsJava()
     {
         return hasMainJava() && !hasMainScala();
@@ -85,6 +106,12 @@ public class Module
     {
         return hasMainScala();
     }
+
+    public boolean hasTestJar()
+    {
+        return testAsJava() || testAsScala();
+    }
+
 
     public boolean testAsJava()
     {

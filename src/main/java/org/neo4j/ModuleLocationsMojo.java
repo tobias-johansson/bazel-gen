@@ -31,23 +31,6 @@ public class ModuleLocationsMojo extends AbstractMojo
     public void execute() throws MojoExecutionException
     {
         Locations locations = new Locations( new Files( rootDir ) );
-        printPomPath( locations.files.root, locations.moduleLocations );
-    }
-
-    private void printPomPath( Path root, Path outFile )
-    {
-        Path base = Paths.get( project.getBasedir().getAbsolutePath() );
-        Path relative = root.relativize( base );
-        String name = project.getGroupId() + ":" + project.getArtifactId();
-        String line = "\"" + name + "\"" + ", " + "\"" + relative.toString() + "\"";
-
-        try ( FileOutputStream os = new FileOutputStream( outFile.toFile(), true ); PrintStream ps = new PrintStream( os ) )
-        {
-            ps.println( line );
-        }
-        catch ( IOException e )
-        {
-            e.printStackTrace();
-        }
+        locations.add( project );
     }
 }

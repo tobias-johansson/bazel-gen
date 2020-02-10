@@ -55,7 +55,7 @@ public class ModuleDepsMojo extends AbstractMojo
         {
             module.dependencies()
                   .filter( Dependencies.Dep::isExternal )
-                  .map( Dependencies.Dep::coords )
+                  .map( Dependencies.Dep::coordinates )
                   .forEach( ps::println );
         }
         catch ( IOException e )

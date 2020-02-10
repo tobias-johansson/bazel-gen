@@ -73,9 +73,11 @@ public class BazelGenerateMojo extends AbstractMojo
                                      .with( "module", module )
                                      .with( "compile", compileDeps.stream()
                                                                   .map( Dependencies.Dep::label )
+                                                                  .distinct()
                                                                   .collect( Collectors.toList() ) )
                                      .with( "test", testDeps.stream()
                                                             .map( Dependencies.Dep::label )
+                                                            .distinct()
                                                             .collect( Collectors.toList() ) )
                                      .with( "javacopts", XmlTools
                                              .start( () -> (Xpp3Dom) project

@@ -1,9 +1,10 @@
 package(default_visibility = ["//visibility:public"])
 
 load("@//tools/build:java.bzl", "junit5_tests")
-{%- if module.buildAsScala() %}
+load("@//tools/checks/headers:headers.bzl", "headers_check")
 load("@io_bazel_rules_scala//scala:scala.bzl", "scala_library", "scala_binary", "scala_test")
-{%- endif %}
+
+headers_check("{{module.headerType()}}")
 
 {%- if module.buildAsJava() %}
 java_library(
@@ -21,7 +22,6 @@ java_library(
     ],
 )
 {%- endif %}
-
 
 {%- if module.buildAsScala() %}
 scala_library(
@@ -51,7 +51,9 @@ java_library(
     srcs = glob(["src/test/java/**/*.java"]),
     resources = glob(["src/test/resources/**"]),
     deps = [
+    {%- if module.hasJar() %}
         ":jar",
+    {%- endif %}
     {%- for dep in test %}
         "{{dep}}",
     {%- endfor %}
@@ -75,6 +77,9 @@ scala_library(
     name = "test-jar",
     srcs = glob(["src/test/scala/**/*.scala", "src/test/java/**/*.java"]),
     deps = [
+    {%- if module.hasJar() %}
+        ":jar",
+    {%- endif %}
     {%- for dep in test %}
         "{{dep}}",
     {%- endfor %}
